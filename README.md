@@ -7,6 +7,57 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+
+
+## A kód lényege
+
+Ez a kód egy UNAS webáruháznak készült, a beszállítóktól beérkező termék listákat gyűjti össze és alakítja át.
+
+- Előnye hogy egyszer megírt programmal megelőzhető egy plusz fizetős szolgáltatás az UNAS-nál
+- Hátránya hogy nem fut felhasználói beavatkozás nélkül.
+
+## A program helye
+
+https://babybear.szabit.hu/
+
+## Az oldal amihez ez a kód létrejött
+
+https://babybear.hu/
+
+## A program elemei
+
+- Feed, mint termékcsatorna. XML, XLSX fájlt tud betölteni vagy feltöltve feldolgozni.
+- Kategóriák, és azok kapcsolata a termékcsatornákhoz. Termék letöltés esetén abba a kategórába teszi amelyik társítva van, így nem kell egyesével kategorizálni a termékeket, de a betöltött termék listákból jött kategóriákat a meglévő kategóriákhoz kell kapcsolni.
+- Import, ami a Feed termékcsatornát betölti ebbe az adatbázisba.
+- Exportnál van több variáció, mert nem mindig kell a termék összes adata, pl kategória módoításnál nem kell leírás...
+- Attribútum menü van, de nem használja a program exportra (még)
+
+## A program kódjai
+
+- Feed
+ https://github.com/felszabi/babybear/blob/main/app/Http/Controllers/FeedController.php
+ https://github.com/felszabi/babybear/tree/main/resources/views/feed
+
+- Termékek
+ https://github.com/felszabi/babybear/blob/main/app/Http/Controllers/ProductController.php
+ https://github.com/felszabi/babybear/tree/main/resources/views/product
+
+- Kategóriák
+ https://github.com/felszabi/babybear/blob/main/app/Http/Controllers/CategoryController.php
+ https://github.com/felszabi/babybear/tree/main/resources/views/category
+
+- Néhány Bootstrap elem
+ https://github.com/felszabi/babybear/tree/main/resources/views/components
+ https://github.com/felszabi/babybear/blob/main/resources/views/components/bs-check-input.blade.php
+ https://github.com/felszabi/babybear/blob/main/resources/views/components/bs-pagination.blade.php
+
+## Letöltött kódok
+
+- Felhasználó hitelesítés 
+- Excel tábla betöltés shuchkin/simplexlsx
+
+
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
