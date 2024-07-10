@@ -70,15 +70,20 @@ Route::middleware(['auth','verified'])->group(function(){
     // ha valahol megáll lehessen tovább ugrani döntés nélkül
 
     Route::get('/export/all', [ProductController::class,'exportall'])->name('export.allproducts');
+    Route::get('/export/allproductswithcategories', [ProductController::class,'exportallproductswithcategories'])->name('export.allproductswithcategories');
+
+    
 
 Route::get('/export/allimage', [ProductController::class,'createimagelisttxt'])->name('export.allproductimages');
 
-
+    Route::get('/products/renameallcategories/{feed}', [ProductController::class,'renameAllCategories'])->name('products.renameallcategories');
     Route::get('/products', [ProductController::class,'create'])->name('products');
     Route::post('/products', [ProductController::class,'store'])->name('product.store');
     Route::get('/productlist', [ProductController::class,'index'])->name('productlist');
 
     Route::get('/category', [CategoryController::class,'index'])->name('category');
+    Route::get('/category/edit/{category}', [CategoryController::class,'edit'])->name('category.edit');
+    Route::post('/category/update/{category}', [CategoryController::class,'update'])->name('category.update');
 
 
     Route::get('/attribute', [AttributeController::class, 'index'])->name('attribute.set');

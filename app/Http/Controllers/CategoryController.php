@@ -47,6 +47,8 @@ class CategoryController extends Controller
     public function edit(Category $category)
     {
         //
+        $categories = Category::orderBy('name')->get();
+        return view('category.edit', ['categories'=> $categories, 'category' => $category]);
     }
 
     /**
@@ -55,6 +57,12 @@ class CategoryController extends Controller
     public function update(UpdateCategoryRequest $request, Category $category)
     {
         //
+        $request->validate([
+            'new_category_name' => ['required', 'string', 'min:3']
+        ]);
+        $category->name = $request->new_category_name;
+        $category->save();
+        return redirect(route('category'));
     }
 
     /**

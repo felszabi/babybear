@@ -20,7 +20,7 @@
 			<tr data-id="{{ $item->id }}">
 				<td class="text-truncate">{{ $item->id }}</td>
 			
-				<td class="text-truncate">{{ $item->name }}</td>
+				<td class="text-truncate"><x-bs-edit-icon href="{{route('category.edit',['category'=>$item])}}" />{{ $item->name }}</td>
 				
 				<td class="text-truncate">{{ $item->foreign_name }}</td>
 			

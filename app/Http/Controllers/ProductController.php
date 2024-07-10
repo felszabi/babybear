@@ -127,9 +127,9 @@ class ProductController extends Controller
             if(!empty($images)){
                 foreach ($images as $imagekey => $src) {
                     if($imagekey == 0){
-                        $rows[] =  $unasid.".jpg"." ". $src; 
+                        $rows[] =  "curl -o ".$unasid.".jpg"." ". $src; 
                     }else{
-                        $rows[] = $unasid."_altpic_".$imagekey.".jpg". " ".$src; 
+                        $rows[] = "curl -o ".$unasid."_altpic_".$imagekey.".jpg". " ".$src; 
                     }
                 }
             }
@@ -139,7 +139,20 @@ class ProductController extends Controller
         }
     }
 
-    public function importaddnew(Feed $feed, $nth){
+    public function renameAllCategories(Feed $feed)
+    {
+        $this::importaddnew($feed, 0, 'renameCategories');
+    }
+
+    public function productCategoryEdit(Product $product, $categoryName)
+    {
+        if($product->category!=$categoryName){
+            $product->category = $categoryName;
+            $product->save();
+        }
+    }
+
+    public function importaddnew(Feed $feed, $nth, $action = null){
         //csináljon meg 30 darabot, vagy kérdezzen előtte, majd töltse ujra
         $step = 20000;
         $feedPath = 'feedasset/'.$feed->filename;
@@ -167,7 +180,7 @@ class ProductController extends Controller
                              $product[$col->getName()] = $col;
                              $columnNames[] = $col->getName();
                            }
-                           if(!$this::importproduct($feed,$product,$columnNames)){
+                           if(!$this::importproduct($feed,$product,$columnNames,$action)){
                                 $connectedcols = json_decode($feed->connentedcols,true);
                                 $categorycol = 0;
                                 foreach($connectedcols as $col => $connect){
@@ -208,7 +221,7 @@ class ProductController extends Controller
                         $max = $nth+$step;
                     }
                     for($i=$nth;$i<$max;$i++){
-                        if(!$this::importproduct($feed, $rows[$i],$columnNames)){
+                        if(!$this::importproduct($feed, $rows[$i],$columnNames, $action)){
                             $connectedcols = json_decode($feed->connentedcols,true);
                             $categorycol = 0;
                             $cnt = 0;
@@ -312,7 +325,7 @@ class ProductController extends Controller
         return redirect(route('import.addnew',['feed'=>$feed, 'nth' => $nth]));
     }
 
-    public function importproduct(Feed $feed, array $product, array $names)
+    public function importproduct(Feed $feed, array $product, array $names, $action = null)
     {
         $columns = array();
         $productskeysIsNumeric = false;
@@ -388,27 +401,37 @@ class ProductController extends Controller
                 
             }
             
-
+            if(!is_null($action)){
+                switch($action){
+                    case 'renameCategories': $this::productCategoryEdit($foundProduct,$this::categorySearch($columnsearch['category']));
+                    break;
+                    default: break;
+                    
+                }
+            }
             // ar keszlet ellenorzes !!!
             // kép ellenőrzés
             return true;
         }else{
-           if($foundCategory = $this::categorySearch($columnsearch['category'])){
-                $newproduct = Product::create([
-                    'name' => $columnsearch['name'],
-                    'sku' => $columnsearch['sku'],
-                    'price' => $columnsearch['price'],
-                    'connection' => $feed->id,
-                    'ean' => isset($columnsearch['ean'])?$columnsearch['ean']:'',
-                    'manufacturer' => $columnsearch['manufacturer'],
-                    'stock' => $columnsearch['stock'],
-                    'category' => $foundCategory,
-                    'description' => html_entity_decode($columnsearch['description']),
-                    'status' => 1
-                ]); 
-           }else{
-                return false;
-           }
+            if(is_null($action)){
+               if($foundCategory = $this::categorySearch($columnsearch['category'])){
+                    $newproduct = Product::create([
+                        'name' => $columnsearch['name'],
+                        'sku' => $columnsearch['sku'],
+                        'price' => $columnsearch['price'],
+                        'connection' => $feed->id,
+                        'ean' => isset($columnsearch['ean'])?$columnsearch['ean']:'',
+                        'manufacturer' => $columnsearch['manufacturer'],
+                        'stock' => $columnsearch['stock'],
+                        'category' => $foundCategory,
+                        'description' => html_entity_decode($columnsearch['description']),
+                        'status' => 1
+                    ]); 
+               }else{
+                    return false;
+               } 
+            }
+           
            
         return true;
         }
@@ -463,6 +486,38 @@ class ProductController extends Controller
             }
         }
         return $result;
+    }
+
+    public function exportallproductswithcategories()
+    {
+        $productArray = array();
+
+        $productsAll = Product::get();
+        foreach($productsAll as $p){
+            $productArray[] = array('Cikkszám' => $p->id .'_'. $p->sku .'_'. $p->connection,
+                                    'Termék Név' => $p->name,
+                                    //'Bruttó Ár' => intval($p->price),
+                                    //'Nettó Ár' => (intval($p->price)/1.27),
+                                    'Kategória' => $p->category  ); 
+        }
+        
+        $UNASdatabaseId = 62930;
+
+        $newPath = Storage::path('feedasset');
+        $filename = 'productExportJustCategories'.'.xml';
+        $f = fopen($newPath."/".$filename,"w");
+        fwrite($f,$this::getUnasXmlHeader($UNASdatabaseId, $productArray));
+        $termekDarabszam = count($productArray);
+
+        for($i=0;$i<$termekDarabszam;$i++){
+       //     $xmlContent = getUnasXmlItem($productArray,$i);
+            fwrite($f,$this::getUnasXmlItem($productArray,$i));
+        }
+       // $xmlFooter = getUnasXmlFooter();
+        fwrite($f,$this::getUnasXmlFooter());
+        fclose($f);
+
+        die('productExportJustCategories xml kesz');
     }
 
     public function exportall()

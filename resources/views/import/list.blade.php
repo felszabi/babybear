@@ -47,6 +47,10 @@
 						<li class="list-group-item">
 							<a href="{{route('import.new',['feed'=>$item->id])}}" class="btn btn-primary btn-sm">uj termékek hozzáadása</a>
 						</li>
+
+						<li class="list-group-item">
+							<a href="{{route('products.renameallcategories',['feed'=>$item->id])}}" class="btn btn-primary btn-sm">termék kategóriák frissítése</a>
+						</li>
 					</ul>
 					@else
 					{{ __('Fájl nincs feltöltve!') }}

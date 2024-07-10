@@ -46,8 +46,10 @@
             Export
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{{route('export.allproducts')}}">UNAS-ba</a></li>
+            <li><a class="dropdown-item" href="{{route('export.allproducts')}}">Teljes export UNAS-ba</a></li>
+            <li><a class="dropdown-item" href="{{route('export.allproductswithcategories')}}">Termékek uj kategóriákkal export UNAS-ba</a></li>
           </ul>
+
         </li>
       </ul>
     
